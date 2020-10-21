@@ -69,11 +69,18 @@ class ToneGenerator
         $decGrausPorAmostra  = 360 / $decAmostrasPorCiclo; //-- Graus (°) por amostra, para onda senoidal
         $intQtdeAmostras = $this->intTaxaAmostra * $intSegundos;
 
+        $intValorMaximoBits = ((2 ** $this->intBits) / 2) - 1;
+
         $decGrau = 0.0;
         $strBytes = '';
         for ($i = 0; $i < $intQtdeAmostras; $i++) {
-            $intBytes  = $this->intBits * sin(deg2rad($decGrau));
-            $strBytesAmostra = $this->getBytes($intBytes);
+            $intBits  = (int) ($intValorMaximoBits * sin(deg2rad($decGrau)));
+            if ($this->intBits == self::BITS_8) {
+                $intBits += $intValorMaximoBits;
+            } /*else {
+                if ($intBits < 0) $intBits = ($intValorMaximoBits + 1) - $intBits;
+            }*/
+            $strBytesAmostra = $this->getBytes($intBits);
             $strBytes .= $strBytesAmostra;
             if ($this->intQtdeCanais == self::STEREO) {
                 $strBytes .= $strBytesAmostra;
