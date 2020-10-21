@@ -39,7 +39,7 @@
 
                 <div class="form-group">
                     <label for="freq">Taxa de Bits por Amostra</label>
-                    <select class="form-control" name="taxa" id="taxa" style="width: 150px;">
+                    <select class="form-control" name="bits" id="bits" style="width: 150px;">
                         <option value="8">8 bits</option>
                         <option value="16" selected>16 bits</option>
                         <option value="24">24 bits</option>

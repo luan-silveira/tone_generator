@@ -45,7 +45,7 @@ class ToneGenerator
         $strDados .= $strTamanhoCabecalho . $strFormatoAudio . $strNumCanais . $strTaxaAmostra . $strTaxaBytes . $strAlinhamentoBloco . $strBits;
         $strDados .= 'data' . $strTamanhoDados . $this->gerarBytesTomSenoidal($intFrequencia, $intSegundos);
 
-        return file_put_contents('teste.wav', $strDados);
+        return file_put_contents('teste.wav', utf8_decode($strDados));
     }
 
     /**
