@@ -24,6 +24,7 @@ class ToneGenerator
 
     public function gerarTom($intFrequencia, $intSegundos)
     {
+        // ini_set('default_charset', 'ASCII');
         $intTaxaBytes        = $this->intTaxaAmostra * $this->intQtdeCanais * $this->intBits / 8;
         $intAlinhamentoBloco = $this->intQtdeCanais * $this->intBits / 8;
         $intQtdeAmostras     = $this->intTaxaAmostra * $intSegundos;
@@ -45,7 +46,13 @@ class ToneGenerator
         $strDados .= $strTamanhoCabecalho . $strFormatoAudio . $strNumCanais . $strTaxaAmostra . $strTaxaBytes . $strAlinhamentoBloco . $strBits;
         $strDados .= 'data' . $strTamanhoDados . $this->gerarBytesTomSenoidal($intFrequencia, $intSegundos);
 
-        return file_put_contents('teste.wav', utf8_decode($strDados));
+        $strArquivo = 'teste.wav';
+        if (file_exists($strArquivo)) unlink($strArquivo);
+        $intRetorno =  file_put_contents($strArquivo, $strDados);
+
+        // ini_set('default_charset', 'UTF-8');
+
+        return $intRetorno;
     }
 
     /**
@@ -58,8 +65,8 @@ class ToneGenerator
      */
     private function gerarBytesTomSenoidal($intFrequencia, $intSegundos)
     {
-        $intAmostrasPorCiclo = $this->intTaxaAmostra / $intFrequencia; //-- Quantidade de amostras por cada ciclo (amostras por Hertz)
-        $intGrausPorAmostra  = 360 / $intAmostrasPorCiclo; //-- Graus (°) por amostra, para onda senoidal
+        $decAmostrasPorCiclo = $this->intTaxaAmostra / $intFrequencia; //-- Quantidade de amostras por cada ciclo (amostras por Hertz)
+        $decGrausPorAmostra  = 360 / $decAmostrasPorCiclo; //-- Graus (°) por amostra, para onda senoidal
         $intQtdeAmostras = $this->intTaxaAmostra * $intSegundos;
 
         $decGrau = 0.0;
@@ -71,7 +78,7 @@ class ToneGenerator
             if ($this->intQtdeCanais == self::STEREO) {
                 $strBytes .= $strBytesAmostra;
             }
-            $decGrau  += $intGrausPorAmostra;
+            $decGrau  += $decGrausPorAmostra;
         }
 
         return $strBytes;
@@ -96,6 +103,8 @@ class ToneGenerator
                 $intByte = $intValor % 256;
                 $strBytes .= chr($intByte);
                 $intValor = (int) ($intValor / 256);
+            } else {
+                $strBytes .= chr(0);
             }
         }
 
