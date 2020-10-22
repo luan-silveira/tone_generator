@@ -24,7 +24,6 @@ class ToneGenerator
 
     public function gerarTom($intFrequencia, $intSegundos)
     {
-        // ini_set('default_charset', 'ASCII');
         $intTaxaBytes        = $this->intTaxaAmostra * $this->intQtdeCanais * $this->intBits / 8;
         $intAlinhamentoBloco = $this->intQtdeCanais * $this->intBits / 8;
         $intQtdeAmostras     = $this->intTaxaAmostra * $intSegundos;
@@ -48,9 +47,10 @@ class ToneGenerator
 
         $strArquivo = 'teste.wav';
         if (file_exists($strArquivo)) unlink($strArquivo);
-        $intRetorno =  file_put_contents($strArquivo, $strDados);
-
-        // ini_set('default_charset', 'UTF-8');
+        // $intRetorno =  file_put_contents($strArquivo, $strDados, FILE);
+        $resArquivo = fopen($strArquivo, 'wb');
+        $intRetorno = fwrite($resArquivo, $strDados);
+        fclose($resArquivo);
 
         return $intRetorno;
     }
