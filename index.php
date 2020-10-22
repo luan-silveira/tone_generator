@@ -28,6 +28,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="onda">Formato de Onda</label>
+                    <select class="form-control" name="onda" id="onda" style="width: 150px;">
+                        <option value="1">Senoidal</option>
+                        <option value="2">Quadrada</option>
+                        <!-- <option value="3">Triangular</option>
+                        <option value="4">Dente de Serra</option> -->
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="freq">Taxa de Amostragem</label>
                     <select class="form-control" name="taxa" id="taxa" style="width: 150px;">
                         <option value="22050">22.050 Hz</option>

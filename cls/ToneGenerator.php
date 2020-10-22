@@ -10,19 +10,26 @@ class ToneGenerator
     const MONO = 1;
     const STEREO = 2;
 
+    const ONDA_SENOIDAL = 1;
+    const ONDA_QUADRADA = 2;
+    const ONDA_TRIANGULAR = 3;
+    const ONDA_DENTE_SERRA = 4;
+
     private $intTaxaAmostra;
     private $intBits;
     private $intQtdeCanais;
+    private $intAmplitude;
 
     public function __construct($intTaxaAmostra = 441000, $intBits = self::BITS_16, $intQtdeCanais = self::MONO)
     {
         $this->intTaxaAmostra = $intTaxaAmostra;
         $this->intBits = $intBits;
         $this->intQtdeCanais = $intQtdeCanais;
+        $this->intAmplitude = ((2 ** $intBits) / 2) - 1;
     }
 
 
-    public function gerarTom($intFrequencia, $intSegundos)
+    public function gerarTom($intFrequencia, $intSegundos, $intTipo = self::ONDA_SENOIDAL)
     {
         $intTaxaBytes        = $this->intTaxaAmostra * $this->intQtdeCanais * $this->intBits / 8;
         $intAlinhamentoBloco = $this->intQtdeCanais * $this->intBits / 8;
@@ -43,7 +50,7 @@ class ToneGenerator
 
         $strDados  = 'RIFF' . $strTamanhoArquivo . 'WAVEfmt ';
         $strDados .= $strTamanhoCabecalho . $strFormatoAudio . $strNumCanais . $strTaxaAmostra . $strTaxaBytes . $strAlinhamentoBloco . $strBits;
-        $strDados .= 'data' . $strTamanhoDados . $this->gerarBytesTomSenoidal($intFrequencia, $intSegundos);
+        $strDados .= 'data' . $strTamanhoDados . $this->gerarBytesTom($intFrequencia, $intSegundos, $intTipo);
 
         $strArquivo = 'teste.wav';
         if (file_exists($strArquivo)) unlink($strArquivo);
@@ -63,22 +70,31 @@ class ToneGenerator
      * 
      * @return void
      */
-    private function gerarBytesTomSenoidal($intFrequencia, $intSegundos)
+    private function gerarBytesTom($intFrequencia, $intSegundos, $intTipo = self::ONDA_SENOIDAL)
     {
         $decAmostrasPorCiclo = $this->intTaxaAmostra / $intFrequencia; //-- Quantidade de amostras por cada ciclo (amostras por Hertz)
-        $decGrausPorAmostra  = 360 / $decAmostrasPorCiclo; //-- Graus (°) por amostra, para onda senoidal
         $intQtdeAmostras = $this->intTaxaAmostra * $intSegundos;
+        
 
-        $intValorMaximoBits = ((2 ** $this->intBits) / 2) - 1;
+        switch($intTipo) {
+            case self::ONDA_SENOIDAL:
+                return $this->geraOndaSenoidal($intQtdeAmostras, $decAmostrasPorCiclo);
+            case self::ONDA_QUADRADA:
+                return $this->gerarOndaQuadrada($intQtdeAmostras, $decAmostrasPorCiclo);
+        }
+    }
 
+    private function geraOndaSenoidal($intQtdeAmostras, $decAmostrasPorCiclo)
+    {
+        $decGrausPorAmostra  = 360 / $decAmostrasPorCiclo; //-- Graus (°) por amostra, para onda senoidal
         $decGrau = 0.0;
         $strBytes = '';
         for ($i = 0; $i < $intQtdeAmostras; $i++) {
-            $intBits  = (int) ($intValorMaximoBits * sin(deg2rad($decGrau)));
+            $intBits  = (int) ($this->intAmplitude * sin(deg2rad($decGrau)));
             if ($this->intBits == self::BITS_8) {
-                $intBits += $intValorMaximoBits;
+                $intBits += $this->intAmplitude;
             } /*else {
-                if ($intBits < 0) $intBits = ($intValorMaximoBits + 1) - $intBits;
+                if ($intBits < 0) $intBits = ($this->intAmplitude + 1) - $intBits;
             }*/
             $strBytesAmostra = $this->getBytes($intBits);
             $strBytes .= $strBytesAmostra;
@@ -86,6 +102,22 @@ class ToneGenerator
                 $strBytes .= $strBytesAmostra;
             }
             $decGrau  += $decGrausPorAmostra;
+        }
+
+        return $strBytes;
+    }
+
+    private function gerarOndaQuadrada($intQtdeAmostras, $decAmostrasPorCiclo)
+    {
+        $strBytes = '';
+        $boolPositivo = true;
+        $intAmostras = round($decAmostrasPorCiclo / 2);
+        for ($i = 0; $i < $intQtdeAmostras; $i++) {
+            if ($i > 0 && $i % $intAmostras == 0) {
+                $boolPositivo = !$boolPositivo;
+            }
+
+            $strBytes .= $this->getBytes($boolPositivo ? $this->intAmplitude : -$this->intAmplitude);
         }
 
         return $strBytes;
