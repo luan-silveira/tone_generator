@@ -29,7 +29,7 @@ class ToneGenerator
     }
 
 
-    public function gerarTom($intFrequencia, $intSegundos, $intTipo = self::ONDA_SENOIDAL)
+    public function gerarTom($strArquivo, $intFrequencia, $intSegundos, $intTipo = self::ONDA_SENOIDAL)
     {
         $intTaxaBytes        = $this->intTaxaAmostra * $this->intQtdeCanais * $this->intBits / 8;
         $intAlinhamentoBloco = $this->intQtdeCanais * $this->intBits / 8;
@@ -52,7 +52,6 @@ class ToneGenerator
         $strDados .= $strTamanhoCabecalho . $strFormatoAudio . $strNumCanais . $strTaxaAmostra . $strTaxaBytes . $strAlinhamentoBloco . $strBits;
         $strDados .= 'data' . $strTamanhoDados . $this->gerarBytesTom($intFrequencia, $intSegundos, $intTipo);
 
-        $strArquivo = 'teste.wav';
         if (file_exists($strArquivo)) unlink($strArquivo);
         // $intRetorno =  file_put_contents($strArquivo, $strDados, FILE);
         $resArquivo = fopen($strArquivo, 'wb');

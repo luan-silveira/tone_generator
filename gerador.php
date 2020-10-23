@@ -11,8 +11,9 @@ $intBits  = $_POST['bits'];
 $intOnda  = $_POST['onda'];
 
 $gerador = new ToneGenerator($intTaxa, $intBits);
+$strArquivo = 'tmp/' . uniqid() .'.wav';
 
-$intTamanhoArquivo =  $gerador->gerarTom($intFreq, $intTempo, $intOnda);
+$intTamanhoArquivo =  $gerador->gerarTom($strArquivo, $intFreq, $intTempo, $intOnda);
 
 if ($intTamanhoArquivo == false) {
     die(json_encode([
@@ -25,5 +26,6 @@ $strTamanho = number_format($intTamanhoArquivo / 1024, 1, ',', '.');
 
 echo json_encode([
     'sucesso' => true,
-    'mensagem' => "Arquivo gerado : 'teste.wav'. Tamanho: $strTamanho KB"
+    'mensagem' => "Arquivo gerado. Tamanho: $strTamanho KB",
+    'arquivo' => $strArquivo
 ]);

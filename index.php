@@ -56,10 +56,18 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Gerar</button>
+                <button type="submit" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm" role="status" style="display: none;"></span>
+                    Gerar
+                </button>
 
                 <div class="alert alert-info" id="divInfo" style="display: none; margin-top: 20px;"></div>
+
             </form>
+
+            <audio id="audio" controls style="display: none; margin-top: 15px; width: 100%">
+                <!-- <source src="teste.wav"> -->
+            </audio>
         </div>
     </div>
 </body>
