@@ -19,7 +19,7 @@
             <form id="form">
                 <div class="form-group">
                     <label for="freq">Frequência (Hz)</label>
-                    <input class="form-control" style="width: 200px;" value="440" type="number" name="freq" id="freq" min="20" max="20000">
+                    <input class="form-control" style="width: 200px;" value="440" type="number" name="freq" id="freq" min="1" max="20000">
                 </div>
 
                 <div class="form-group">

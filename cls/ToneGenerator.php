@@ -134,6 +134,7 @@ class ToneGenerator
     private function getBytes($intValor, $intQtdeBytes = null)
     {
         if (!$intQtdeBytes) $intQtdeBytes = $this->intBits / 8;
+        if ($intValor < 0) $intValor = (256 ** $intQtdeBytes) - abs($intValor);
 
         $strBytes = '';
         for ($i = 0; $i < $intQtdeBytes; $i++) {
