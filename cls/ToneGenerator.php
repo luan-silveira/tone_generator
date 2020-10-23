@@ -77,29 +77,21 @@ class ToneGenerator
 
         switch($intTipo) {
             case self::ONDA_SENOIDAL:
-                return $this->geraOndaSenoidal($intQtdeAmostras, $decAmostrasPorCiclo);
+                return $this->gerarOndaSenoidal($intQtdeAmostras, $decAmostrasPorCiclo);
             case self::ONDA_QUADRADA:
                 return $this->gerarOndaQuadrada($intQtdeAmostras, $decAmostrasPorCiclo);
         }
     }
 
-    private function geraOndaSenoidal($intQtdeAmostras, $decAmostrasPorCiclo)
+    private function gerarOndaSenoidal($intQtdeAmostras, $decAmostrasPorCiclo)
     {
         $decGrausPorAmostra  = 360 / $decAmostrasPorCiclo; //-- Graus (°) por amostra, para onda senoidal
         $decGrau = 0.0;
         $strBytes = '';
         for ($i = 0; $i < $intQtdeAmostras; $i++) {
             $intBits  = (int) ($this->intAmplitude * sin(deg2rad($decGrau)));
-            if ($this->intBits == self::BITS_8) {
-                $intBits += $this->intAmplitude;
-            } /*else {
-                if ($intBits < 0) $intBits = ($this->intAmplitude + 1) - $intBits;
-            }*/
             $strBytesAmostra = $this->getBytes($intBits);
             $strBytes .= $strBytesAmostra;
-            if ($this->intQtdeCanais == self::STEREO) {
-                $strBytes .= $strBytesAmostra;
-            }
             $decGrau  += $decGrausPorAmostra;
         }
 
@@ -122,9 +114,24 @@ class ToneGenerator
         return $strBytes;
     }
 
+    // public function gerarOndaDenteSerra($intQtdeAmostras, $decAmostrasPorCiclo)
+    // {
+    //     $decPasso = $this->intAmplitude * 2 / $decAmostrasPorCiclo;
+    //     $intBits = 0;
+    //     $strBytes = '';
+    //     for ($i = 0; $i < $intQtdeAmostras; $i++) {
+    //         if ($strBytes)
+    //         $strBytes = $this->getBytes((int) round($intBits));
+    //         $intBits += $decPasso;
+    //     }
+
+    //     return $strBytes;
+    // }
+
 
     /**
-     * Retorna uma string com os bytes de um valor inteiro, no formato little-endian (ordem reversa dos bytes)
+     * Retorna uma string com os bytes de um valor inteiro, no formato little-endian (ordem reversa dos bytes).
+     * Se for estéreo, retorna os bytes duplicados.
      *
      * @param int $intValor Valor inteiro, correspondente ao número de bits
      * @param int $intQtdeBytes Tamanho, em bytes. Se não informado, utiliza a profundidade de bits dividido por 8.
@@ -135,6 +142,7 @@ class ToneGenerator
     {
         if (!$intQtdeBytes) $intQtdeBytes = $this->intBits / 8;
         if ($intValor < 0) $intValor = (256 ** $intQtdeBytes) - abs($intValor);
+        if ($this->intBits == self::BITS_8) $intValor += $this->intAmplitude;
 
         $strBytes = '';
         for ($i = 0; $i < $intQtdeBytes; $i++) {
@@ -146,6 +154,8 @@ class ToneGenerator
                 $strBytes .= chr(0);
             }
         }
+
+        if ($this->intQtdeCanais == self::STEREO) $strBytes .= $strBytes;
 
         return $strBytes;
     }
